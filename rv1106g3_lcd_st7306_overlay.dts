@@ -1,0 +1,45 @@
+/*
+*   测试设备为rv1106-luckfox-pico-zero开发版
+*   请根据使用的开发板自行修改(动态设备树未测试)
+*/
+/dts-v1/;
+/plugin/;
+
+#include "rv1106.dtsi"
+#include "rv1106-luckfox-pico-zero-ipc.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/display/media-bus-format.h>
+
+/{
+    compatible = "rockchip,rv1103g-38x38-ipc-v10", "rockchip,rv1106g3";
+    fragment@0{
+        target = <&spi0>; //使用spi0节点
+        __overlay__{
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 =<&spi0m0_pins>;
+        //禁用可能抢占的节点
+            spidev@0{
+                status = "disabled";
+            };
+        //启用fbtft节点        
+            fbtft@0 {
+                status = "okay";
+                compatible = "sitronix,st7306";
+                reg = <0>; // SPI从设备地址
+                spi-max-frequency = <48000000>;
+                spi-cpol;
+                spi-cpha;
+                fps = <60>;
+                rgb;
+                buswidth = <8>;
+                dc-gpios = <&gpio0 RK_PA3 GPIO_ACTIVE_HIGH>;
+                reset-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_LOW>;
+                te-gpios = <&gpio1 RK_PC7 GPIO_ACTIVE_HIGH>;
+                width = <210>;
+                height = <480>;
+                debug = <0x7>;
+            };
+        };
+    };
+};
